@@ -1181,7 +1181,7 @@ em conta, poderá produzir resultados indesejáveis.
 
 Por exemplo, multiplicações e divisões são calculadas antes de soma e
 subtração. Porém, uma soma entre parênteses é calculada antes, pois os
-parênteses tem precedência sobre a multiplicação e a divisão.
+parênteses têm precedência sobre a multiplicação e a divisão.
 
 Os operadores são avaliados na seguinte ordem:
 ! ~ ++ --       - 'NÃO' lógico, complemento, incremento e decremento;
@@ -1969,7 +1969,7 @@ senao x & intbit("2 5") == intbit("5")
 fimse
 
 15.2.23. intbith(<um ou mais textos>)
-Funciona exatamente como txtbit, porém retorna um texto que é o número
+Funciona exatamente como intbit, porém retorna um texto que é o número
 em hexadecimal.
 
 15.2.24. txtbit(<número>, [delimitador])
@@ -2321,7 +2321,7 @@ Procura <texto2> em <texto1>.
 Retorna -1 se não encontrou ou o número do caracter se encontrou.
 O [caracter inicial] indica o número do caracter em que deve-se começar
 a busca. O valor 0 corresponde ao primeiro caracter, o valor 1 o segundo,
-etc. Se omitido começa no primeiro.
+etc. Se omitido, começa no primeiro.
 
 As funções txtprocmai e txtprocdif fazem a mesma coisa, exceto que:
 txtproc    - Considera iguais letras minúsculas, maiúsculas e acentuadas;
