@@ -4,11 +4,11 @@ const txtajuda = "\b\c3Aprender\b\n\
 Sintaxe: APRENDER <nome ou número do curso>\n\
 Aprende um pouco sobre uma habilidade ou idioma.\n\
 Para saber o que é ensinado em algum lugar, tecle AULAS."
+#
+const m_pontos1 = "Você precisa de um ponto de aula"
+const m_pontos2 = "Você precisa de $m pontos de aula"
 
 func escr
-  se config:aulas && !arg0.var.z_aulas
-    ret arg0.msg("Você não possui pontos de aula.")
-  fimse
   ret !arg1, arg0.msg("Aprender o quê?")
   uint32 aulas # Quantas aulas ensina
   uint32 valor # Preço da aula
@@ -40,9 +40,9 @@ func escr
       fimse
 # Checa se está limitado a alguns tipos (raças/classes)
       se !r.tipoperso
-      senao negociar_tipo(arg0.tipo1, r.tipoperso)
-      senao negociar_tipo(arg0.tipo2, r.tipoperso)
-      senao negociar_tipo(arg0.tipo3, r.tipoperso)
+      senao arg0.tipo1 && txtproclin(txte(r.tipoperso), txte(arg0.tipo1)) >= 0
+      senao arg0.tipo2 && txtproclin(txte(r.tipoperso), txte(arg0.tipo2)) >= 0
+      senao arg0.tipo3 && txtproclin(txte(r.tipoperso), txte(arg0.tipo3)) >= 0
       senao
         lin = "Não tem como ensinar " + lin + " para sua raça e classe."
         ret arg0.msg(txtcopiamai(p.descnome, "A") + ": " + lin)
@@ -73,8 +73,13 @@ func escr
         lin = "Você não tem $" + valor + " e eu não ensino " + lin + " de graça."
         ret arg0.msg(txtcopiamai(p.descnome, "A") + ": " + lin)
       fimse
+# Checa pontos de aula
+      se arg0.var.z_aulas_ < int(r.aulapontos)
+        $mens.mens = int(r.aulapontos)
+        ret $mens.mp($mens.mens == "1" ? m_pontos1 : m_pontos2, arg0)
+      fimse
 # Ensina
-      config:aulas && arg0.var.z_aulas_--
+      arg0.var.z_aulas_ -= int(r.aulapontos)
       arg0.var.z_moedas_ -= valor
       lin = arg0.var.[nomevar]_ + 1
       txt2(arg0.var.[nomevar]) && (lin += " " + txt2(arg0.var.[nomevar]))

@@ -164,6 +164,15 @@ arg0 = hora atual
 É chamado sempre que a hora MUD muda (a cada 5 minutos), desde que o objeto
 esteja recebendo eventos da hora. Vide também constante evhora (abaixo).
 
+func cmd_reset
+Chamado para o objeto a_ da área quando ocorre reset de área, logo após
+executar o reset nas salas da área. Exemplo, para informar as horas sempre
+que ocorre reset na área teste (desde que esteja configurada para ter reset),
+criar a seguinte função na classe a_teste, arquivo areas/teste.int:
+func cmd_reset
+  $mens.p($b_teste)
+  $mens.mareatodos1("Hora atual: " + misc:hora)
+
 
 3. Eventos incondicionais
 
@@ -289,6 +298,22 @@ arg1 = sala
 arg2 = animal
 arg3 = origem do evento: arg0, arg1 ou arg2
 
+func cmd_encheu
+arg0 = personagem
+arg1 = item que foi enchido
+arg2 = item que foi esvaziado
+arg3 = líquido (objeto)
+arg4 = quantidade em ml
+arg5 = origem do evento: arg0, arg1, arg2 ou arg3
+É chamada também a função cmd_encheu de arg3.
+
+func cmd_esvaziou
+arg0 = personagem
+arg1 = item que foi esvaziado
+arg2 = líquido (objeto), pode ser nulo
+arg3 = origem do evento: arg0, arg1 ou arg2
+É chamada também a função cmd_esvaziou de arg2.
+
 func cmd_acendeu
 func cmd_apagou
 arg0 = personagem que acendeu ou apagou um item, ou nulo se apagou sozinho
@@ -313,7 +338,8 @@ func cmd_comeu
 func cmd_recitou
 arg0 = personagem que comeu, bebeu ou recitou alguma coisa
 arg1 = item
-arg2 = origem do evento: arg0 ou arg1
+arg2 = origem do evento: arg0, arg1 ou arg3
+arg3 = objeto do líquido, ex. $liq_água (somente em cmd_bebeu)
 
 func cmd_alvofim
 arg0 = personagem que usou uma habilidade ou magia não agressiva
@@ -468,6 +494,22 @@ arg1 = sala
 arg2 = animal
 arg3 = origem do evento: arg0, arg1 ou arg2
 
+func cmd_encher
+arg0 = personagem
+arg1 = item que será enchido
+arg2 = item que será esvaziado
+arg3 = líquido (objeto)
+arg4 = quantidade em ml
+arg5 = origem do evento: arg0, arg1, arg2 ou arg3
+É chamada também a função cmd_encher de arg3.
+
+func cmd_esvaziar
+arg0 = personagem
+arg1 = item que será esvaziado
+arg2 = líquido (objeto), pode ser nulo
+arg3 = origem do evento: arg0, arg1 ou arg2
+É chamada também a função cmd_esvaziar de arg2.
+
 func cmd_acender
 func cmd_apagar
 arg0 = personagem que quer acender ou apagar um item
@@ -493,7 +535,8 @@ func cmd_comer
 func cmd_recitar
 arg0 = personagem que quer comer, beber ou recitar alguma coisa
 arg1 = item
-arg2 = origem do evento: arg0 ou arg1
+arg2 = origem do evento: arg0, arg1 ou arg3
+arg3 = objeto do líquido, ex. $liq_água (somente em cmd_beber)
 
 func cmd_comprar
 func cmd_vender
