@@ -14,9 +14,16 @@ Para saber em que posições pode vestir algo, tecle EQUIP TUDO"
 const posic = 5
 txt12 lugar # Posições aonde quer vestir
 txt12 vest # Posições aonde está vestindo alguma coisa
+#
+const m_sem_args = "Vestir o quê?"
+const m_nao_consegue = "Você não consegue vestir $o."
+const m_nivel = "Você precisa chegar no nível $m para vestir $o."
+const m_renascer1 = "Você precisa renascer uma vez para vestir $o."
+const m_renascer2 = "Você precisa renascer duas vezes para vestir $o."
+const m_renascer3 = "Você precisa renascer $m vezes para vestir $o."
 
 func escr
-  ret !arg1, arg0.msg("Vestir o que?")
+  ret !arg1, $mensjog.msg(m_sem_args, arg0)
   refvar perm_msg = $perm_[arg0.jogperm].vestir
   ret perm_msg, $mensjog.msg(perm_msg, arg0)
   refvar alvo = ref(arg0.persoesc) # Quem vai vestir
@@ -46,7 +53,11 @@ func escr
     epara p = t.ini, p, p.depois
       (lug2 & intbith(p.linha)) == "0" && n.nome(p.texto) && (lugar |= intbith(p.linha))
     efim
-    ret lugar == "0", arg0.msg("Você não sabe aonde fica " + misc:sep2 + ".")
+    se lugar == "0"
+      $mens.mens = misc:sep2
+      $mens.mp("Você não sabe aonde fica $m.", arg0)
+      ret
+    fimse
   fimse
 # Vestir itens
   listaobj l
@@ -58,40 +69,46 @@ func escr
     txt100 erro # Se for um texto vazio, pode vestir
 # Checa se o personagem pode vestir
     se r.vestirsim == (alvo == arg0 ? 2 : 1)
-      erro = "$P não consegue vestir $o."
+      erro = m_nao_consegue
     senao r.vestirsexo == (alvo.psexo ? 1 : 2)
-      erro = "$P não consegue vestir $o."
+      erro = m_nao_consegue
 # Checa o nível
     senao int(r.pnivel) > alvo.pnivel
-      erro = "$P precisa estar no nível " + r.pnivel + " para vestir $o."
+      $mens.mens = r.pnivel
+      erro = m_nivel
     senao int(r.renascer) > alvo.prenascer
+      $mens.mens = r.renascer
       se r.renascer == 1
-        erro = "$P precisa renascer uma vez para vestir $o."
+        erro = m_renascer1
       senao r.renascer == 2
-        erro = "$P precisa renascer duas vezes para vestir $o."
+        erro = m_renascer2
       senao
-        erro = "$P precisa renascer " + r.renascer + " vezes para vestir $o."
+        erro = m_renascer3
       fimse
 # Checa se a classe ou a raça tem permissão
     senao !r.vestirnao
     senao tipo1 && txtproclin(txte(r.vestirnao), tipo1) >= 0
-      erro = "$P não consegue vestir $o."
+      erro = m_nao_consegue
     senao tipo2 && txtproclin(txte(r.vestirnao), tipo2) >= 0
-      erro = "$P não consegue vestir $o."
+      erro = m_nao_consegue
     senao tipo3 && txtproclin(txte(r.vestirnao), tipo3) >= 0
-      erro = "$P não consegue vestir $o."
+      erro = m_nao_consegue
     fimse
 # Tenta vestir
     se erro
       $mens.p(alvo, nulo, r)
-      $mens.mperso(erro)
+      $mens.msginv(erro, arg0)
     senao
       erro = objvestir(arg0, r, int(n))
       erro && arg0.msg(erro)
     fimse
   efim
 # Avisa se não encontrou nenhum item
-  !total && arg0.msg("Você não vê isso.")
+  se !total
+    misc:separa(arg1)
+    $mens.mens = misc:sep1
+    $mens.mp("Você não vê $m.", arg0)
+  fimse
 
 func objvestir # Quer vestir um item
 # arg0 = personagem, arg1 = objeto, arg2 = quantidade
@@ -109,7 +126,7 @@ func objvestir # Quer vestir um item
     se lugar2 == "0"
       listaitem item
       epara item = arg0.dentro2.ini, item, item.depois
-        sair item.obj.vestpos && intbith(item.obj.vestpos - 1) & (lugar1 & vest)
+        sair item.obj.vestpos && (intbith(item.obj.vestpos - 1) & (lugar1 & vest)) != "0"
       efim
       ret "Já está usando " + item.obj.descnome + " nessa posição."
     fimse
@@ -119,13 +136,14 @@ func objvestir # Quer vestir um item
       sair vest & txt(config:vestir[txt1(lin)]) == "0"
     efim
     se !lin
-      lin = txtbit(lugar2)
+      lin = txtbith(lugar2)
       txt12 pos = vest & txt(config:vestir[txt1(lin)])
       listaitem item
       epara item = arg0.dentro2.ini, item, item.depois
-        sair item.obj.vestpos && intbith(item.obj.vestpos - 1) & pos
+        continuar !item.obj.vestpos
+        sair txttroca(intbith(item.obj.vestpos - 1) & pos, "0", "")
       efim
-      ret "Antes precisa parar de usar " + item.obj.descnome + "."
+      ret $mens.mp("Antes precisa parar de usar $o.", arg0, nulo, item.obj)
     fimse
 # Checa se o item deixa vestir
     txt100 txtvestir = arg1.cmd_podevestir(arg0)
